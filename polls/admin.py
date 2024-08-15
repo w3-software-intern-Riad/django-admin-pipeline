@@ -1,6 +1,8 @@
 from django.contrib import admin
 from polls.models import HotelInformation, Images, Amenities, Location
 import os
+from django.utils.html import format_html
+from django.urls import reverse
 
 
 class ImagesInline(admin.TabularInline):
@@ -28,7 +30,7 @@ class LocationInLine(admin.TabularInline):
 
 class HotelInformationAdmin(admin.ModelAdmin):
     inlines = [ImagesInline, LocationInLine, AmenitiesInLine]
-    list_display = ('title', 'description', 'rating', 'price', 'roomType', 'get_location',
+    list_display = ('title', 'description',  'get_location',
                     'get_amenities', 'get_images', 'createDate', 'updateDate')
     exclude = ('updateDate',)
     search_fields = ['title']
@@ -53,9 +55,13 @@ class HotelInformationAdmin(admin.ModelAdmin):
 
 
 class ImageInformationAdmin(admin.ModelAdmin):
-    list_display = ('image', 'hotel', 'createDate', 'updateDate')
+    
+    list_display = ('image_name', 'hotel', 'createDate', 'updateDate')
     search_fields = ['image']
     exclude = ('updateDate',)
+    def image_name(self, obj):
+        return os.path.basename(obj.image.name) if obj.image else "No image"
+    image_name.short_description = 'Image'
     def hotel(self, obj):
         return obj.hotel.title if obj.hotel else "No Hotel"
     hotel.short_description = 'Hotel'
@@ -81,6 +87,6 @@ class AmenitiesInformationAdmin(admin.ModelAdmin):
 
 # Register the models with the customized admin classes
 admin.site.register(HotelInformation, HotelInformationAdmin)
-admin.site.register(Images, ImageInformationAdmin)
+admin.site.register(Images,ImageInformationAdmin)
 admin.site.register(Location, LocationInformationAdmin)
 admin.site.register(Amenities, AmenitiesInformationAdmin)

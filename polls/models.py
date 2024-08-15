@@ -2,9 +2,8 @@
 from django.db import models
 from django.utils import timezone
 import os
-from django.core.files import File
-from django.core.files.storage import default_storage
-from django.core.exceptions import ValidationError
+
+from django.conf import settings
 
 
 class Amenities(models.Model):
@@ -70,9 +69,6 @@ class Location(models.Model):
 class HotelInformation(models.Model):
     title = models.CharField(max_length=500)
     description = models.TextField(max_length=50000,null=True,blank=True)
-    rating = models.FloatField(null=False,default=0)  
-    price = models.FloatField(null=False,default=0)    
-    roomType = models.CharField(max_length=400,null=False,default="Single")  # Make roomType optional
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(null=True, blank=True)
 
@@ -89,22 +85,23 @@ class HotelInformation(models.Model):
     def delete(self, *args, **kwargs):
         # Delete associated images from local storage
         for image in self.images.all():
-            if image.image and default_storage.exists(image.image.name):
-            # Get the full file path
-                image_path = default_storage.path(image.image.name)
+            if image.image:
+                # Get the full file path
+                image_path = os.path.join(settings.MEDIA_ROOT, str(image.image))
+                print("Image path : ",image_path)
                 if os.path.isfile(image_path):
-                    os.remove(image_path)
+                    try:
+                        os.remove(image_path)
+                        print(f"Successfully deleted image: {image_path}")
+                    except Exception as e:
+                        print(f"Error deleting image {image_path}: {str(e)}")
                 else:
-                    print("No image found at", image_path)
-
+                    print(f"No image found at {image_path}")
             else:
-                if not image.image:
-                    print(f"No image file associated with {image}")
-                elif not default_storage.exists(image.image.name):
-                    print(f"Image file {image.image.name} does not exist in storage")
-    
+                print(f"No image file associated with image record {image.id}")
+
         # Call the superclass delete method
-        super().delete(*args, **kwargs)  
+        super().delete(*args, **kwargs)
     
         
 
@@ -123,30 +120,37 @@ class Images(models.Model):
         return os.path.basename(self.image.name) if self.image else "No image"
 
     def save(self, *args, **kwargs):
-        if self.image:
-            # Extract the filename
-            filename = os.path.basename(self.image.name)
-            self.image.name = filename
-
-            # Check if the file is already in the database
-            existing_image = Images.objects.filter(image=self.image.name).exclude(hotel=self.hotel).first()
-            if existing_image:
-                raise ValidationError(f"An image with the name '{self.image.name}' is already associated with another hotel.")
-
-            # Check if the file already exists in the local file storage
-            if default_storage.exists(f'images/{filename}'):
-                raise ValidationError(f"An image with the name '{filename}' already exists in the file storage.")
-
-        else:
+        if not self.image:
             print("No image provided for this instance.")
 
         if self.pk is not None:
             self.updateDate = timezone.now()
         else:
-            print("Creating a new instance; updateDate will not be set.")
+            if Images.objects.filter(hotel=self.hotel, image=self.image).exists():
+                raise ValueError(f"An image with the name {self.image} already exists for this hotel.")
 
         try:
             super().save(*args, **kwargs)
         except Exception as e:
             # Handle errors and possibly log them
             raise ValueError(f"Error saving image: {str(e)}")
+        
+    def delete(self, *args, **kwargs):
+        if self.image:
+            # Get the full file path
+            image_path = os.path.join(settings.MEDIA_ROOT, str(self.image))
+            
+            # Check if file exists and delete it
+            if os.path.isfile(image_path):
+                try:
+                    os.remove(image_path)
+                    print(f"Successfully deleted image file: {image_path}")
+                except Exception as e:
+                    print(f"Error deleting image file {image_path}: {str(e)}")
+            else:
+                print(f"Image file not found: {image_path}")
+        else:
+            print("No image file to delete")
+
+        # Call the superclass delete method to remove the database record
+        super().delete(*args, **kwargs)

@@ -6,12 +6,11 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import authenticate
 from polls.models import HotelInformation, Location, Images
 import psycopg
-from django.core.files import File
-from django.core.files.storage import default_storage
-from colorama import Fore, Style, init
-
+from colorama import  Style, init
 from prompt_toolkit import prompt
 from prompt_toolkit.styles import Style
+from django.conf import settings
+
 
 # Initialize Colorama
 init(autoreset=True)
@@ -91,7 +90,7 @@ class Command(BaseCommand):
 
      
          # Ensure the images/ directory exists
-        django_images_dir = 'images/'
+        django_images_dir = os.path.join(settings.MEDIA_ROOT, 'images/')
         try:
             if not os.path.exists(django_images_dir):
                 os.makedirs(django_images_dir)
@@ -107,6 +106,8 @@ class Command(BaseCommand):
                 continue
 
             propertyTitle, latitude, longitude, location, rating, price, roomType, images = row
+            
+
 
             # Check for missing field values
             if not all([propertyTitle, latitude, longitude, location, rating, price, roomType, images]):
@@ -116,9 +117,7 @@ class Command(BaseCommand):
             try:
                 hotel = HotelInformation.objects.create(
                     title=propertyTitle,
-                    rating=rating,
-                    price=price,
-                    roomType=roomType
+                    
                 )
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Error creating HotelInformation record: {e}'))
@@ -139,29 +138,41 @@ class Command(BaseCommand):
                 continue    
 
             # Create the Images records
-            for image_name in images:
+            processed_images = set()  # To keep track of processed images
+
+            for image_name in images:  # Assuming 'images' is a comma-separated string of image filenames
+                
+                if image_name in processed_images:
+                    self.stdout.write(self.style.WARNING(f'Image {image_name} already processed, skipping.'))
+                    continue
+
                 image_path = os.path.join(scrapy_images_dir, image_name)
-                if os.path.exists(image_path):
+                if os.path.isfile(image_path):
                     try:
-                    # Use Django's file storage to save the image
-                        with open(image_path, 'rb') as img_file:
-                            django_image_path = default_storage.save(f'images/{image_name}', File(img_file))
-                            
+                        destination_path = os.path.join(django_images_dir, image_name)
+                        
+                
+                        # Check if the image already exists for this hotel
+                        if Images.objects.filter(hotel=hotel, image=destination_path).exists():
+                            self.stdout.write(self.style.WARNING(f'Image {destination_path} already exists for this hotel, skipping.'))
+                            continue
 
-                        # Save the image in the database
-                            try:
-                                print('django image path : ',django_image_path)
-                                Images.objects.create(
-                                image=django_image_path,  # Save the relative path to the image
-                                hotel=hotel  # Set the foreign key
-                                )
-                            except Exception as e:
-                                self.stdout.write(self.style.ERROR(f'Error creating Image record: {e}'))
-                                continue  
-                    except IOError as e:
-                        self.stdout.write(self.style.ERROR(f'Error opening image file {image_path}: {e}'))             
+                        # Copy the file to Django's images directory
+                        shutil.copy2(image_path, destination_path)
+                
+                        # Save the image record in the database
+                        Images.objects.create(
+                            hotel=hotel,
+                            image=f'images/{image_name}'
+                        )
 
+                        self.stdout.write(self.style.SUCCESS(f'Successfully copied and saved {image_name}'))
+                        processed_images.add(destination_path)
+                    except Exception as e:
+                        self.stdout.write(self.style.ERROR(f'Error processing {image_name}: {e}'))
                 else:
-                    self.stdout.write(self.style.WARNING(f'Image {image_name} not found in Scrapy images directory.'))
+                    self.stdout.write(self.style.WARNING(f'{image_name} is not a file, skipping.'))
+
+            
 
         self.stdout.write(self.style.SUCCESS('Successfully imported data into HotelInformation and copied images.'))
