@@ -77,10 +77,10 @@ Admin username:👤 [Please provide the admin username that was used during the 
 ```bash
 Admin password:🔑 [Please provide the admin password that was used during the creation of the superuser account.]
 ```
-### If admin is authenticated then 
+### If admin is authenticated then
 
 ```bash
-Database name (scrapy database) : (eg. hotel)
+Database name (scrapy database(PostGres Only)) : (eg. hotel)
 ```
 ```bash
 Database username: (eg. postgres)

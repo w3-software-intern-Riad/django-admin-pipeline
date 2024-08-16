@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 class Amenities(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(null=True, blank=True)
 
@@ -38,7 +38,10 @@ class Location(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(null=True, blank=True)
+    updateDate = models.DateTimeField(null=True, blank=True)    
+
+    class Meta:
+        unique_together = ('name', 'latitude', 'longitude')
 
     def __str__(self):
         return f"{self.name} ({self.get_type_display()})"
@@ -50,7 +53,7 @@ class Location(models.Model):
 
 
 class HotelInformation(models.Model):
-    title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500, unique=True)
     description = models.TextField(max_length=50000, null=True, blank=True)
     locations = models.ManyToManyField(Location, related_name='hotels')
     amenities = models.ManyToManyField(Amenities, related_name='hotels')
