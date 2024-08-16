@@ -66,7 +66,7 @@ create a .env file and configure it as .env.sample
  ## Using the CLI Tool
 The CLI tool is implemented using Django's management commands. It allows importing data from another database. That database should have 8 property like propertyTitle , latitude , longitude , rating, price , location ,roomType, images
 
-### Command
+### Command (make sure venv is activated and you are in project folder)
 ```bash
 python manage.py import_data
 ```
