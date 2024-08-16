@@ -26,6 +26,7 @@ This Django application provides a complete solution for managing hotel informat
 1. **Clone the Repository**
  ```bash
    git clone https://github.com/w3-software-intern-Riad/django-admin-pipeline.git
+cd django-admin-pipeline
    
    ```
    2. **Create a Virtual Environment**
