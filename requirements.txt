@@ -3,3 +3,5 @@ psycopg
 Pillow
 colorama
 prompt_toolkit
+python-dotenv
+python-decouple
