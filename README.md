@@ -60,7 +60,7 @@ create a .env file and configure it as .env.sample
  ## Admin Interface
  - Once the server is running, you can access the Django admin interface at:
  ```bash
- http://127.0.0.0:8000/admin
+ http://127.0.0.1:8000/admin
  ```
  - Log in with the superuser credentials you created to manage hotel information, locations, amenities, and images.
  ## Using the CLI Tool
