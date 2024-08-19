@@ -62,7 +62,14 @@ class Command(BaseCommand):
                         style=custom_style)
         dbport = prompt('Database port (e.g., 5432): ', style=custom_style)
         scrapy_images_dir = prompt(
-            'Directory path of the images in Scrapy project: ', style=custom_style)
+            'Directory path of the images in Scrapy project (full path): ', style=custom_style)
+        
+        # Function to check if the directory exists
+        if not os.path.isdir(scrapy_images_dir):
+            self.stdout.write(self.style.ERROR(
+                'Error: Directory  does not exist on this computer.'))
+            return
+        
 
         # Check for missing fields
         if not dbname or not dbuser or not dbpassword or not dbhost or not dbport:

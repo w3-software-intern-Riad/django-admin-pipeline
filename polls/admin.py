@@ -47,6 +47,10 @@ class HotelInformationAdmin(admin.ModelAdmin):
             )
             obj.locations.add(location)
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()  # This will trigger the delete method in the model
+
 
 class ImageInformationAdmin(admin.ModelAdmin):
     list_display = ('image_name', 'hotel', 'createDate', 'updateDate')
@@ -60,6 +64,10 @@ class ImageInformationAdmin(admin.ModelAdmin):
     def hotel(self, obj):
         return obj.hotel.title if obj.hotel else "No Hotel"
     hotel.short_description = 'Hotel'
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.delete()  # This will trigger the delete method in the model
 
 
 class LocationInformationAdmin(admin.ModelAdmin):
