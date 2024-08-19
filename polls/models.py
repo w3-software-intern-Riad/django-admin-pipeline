@@ -38,7 +38,7 @@ class Location(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(null=True, blank=True)    
+    updateDate = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('name', 'latitude', 'longitude')
@@ -53,10 +53,11 @@ class Location(models.Model):
 
 
 class HotelInformation(models.Model):
-    title = models.CharField(max_length=500, unique=True)
+    title = models.CharField(max_length=500)
     description = models.TextField(max_length=50000, null=True, blank=True)
     locations = models.ManyToManyField(Location, related_name='hotels')
-    amenities = models.ManyToManyField(Amenities, related_name='hotels')
+    amenities = models.ManyToManyField(
+        Amenities, related_name='hotels', blank=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(null=True, blank=True)
 
