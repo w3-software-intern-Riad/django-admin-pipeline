@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 class Amenities(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200, unique=True,null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(null=True, blank=True)
 
