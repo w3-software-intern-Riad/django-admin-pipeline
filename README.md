@@ -45,7 +45,11 @@ create a .env file and configure it as .env.sample
 ```
  5. **Apply Migrations**
 
+
+
  ```bash
+ python manage.py makemigrations polls
+ 
  python manage.py migrate
  ```
 
