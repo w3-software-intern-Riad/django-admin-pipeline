@@ -31,7 +31,7 @@ cd django-admin-pipeline
    ```
    2. **Create a Virtual Environment**
    ```bash
-   python -m venv venv
+   python -m venv venv # or  python3 -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
  3. **Install Dependencies**
@@ -70,6 +70,8 @@ create a .env file and configure it as .env.sample
  - Log in with the superuser credentials you created to manage hotel information, locations, amenities, and images.
  ## Using the CLI Tool
 The CLI tool is implemented using Django's management commands. It allows importing data from another database. That database should have 8 property like propertyTitle , latitude , longitude , rating, price , location ,roomType, images
+### Important Note
+<span style="color:yellow">Open a new terminal window, navigate to the project directory, and activate the virtual environment if it is not already activated.</span>
 
 ### Command (make sure venv is activated and you are in project folder)
 ```bash
@@ -104,7 +106,7 @@ Directory path of the images in Scrapy project: (eg. /home/w3e101/Desktop/hdd_da
 ```
 ## Important Note
 
-- To locate the image path in your Scrapy project, navigate to the `images` folder within the project, open a terminal, and type `pwd`.
+- <span style="color:yellow">To locate the image path in your Scrapy project, navigate to the `images` folder within the project, open a terminal, and type `pwd`.</span>
 
 
 ## Contributing
