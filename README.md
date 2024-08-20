@@ -70,7 +70,7 @@ create a .env file and configure it as .env.sample
  - Log in with the superuser credentials you created to manage hotel information, locations, amenities, and images.
  ## Using the CLI Tool
 The CLI tool is implemented using Django's management commands. It allows importing data from another database. That database should have 8 property like propertyTitle , latitude , longitude , rating, price , location ,roomType, images
-### Important Note
+## Important Note
 <span style="color:yellow">Open a new terminal window, navigate to the project directory, and activate the virtual environment if it is not already activated.</span>
 
 ### Command (make sure venv is activated and you are in project folder)
